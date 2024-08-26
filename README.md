@@ -35,7 +35,7 @@ This is a real-time chat application built using modern web technologies. It pro
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/chat-application.git
+   git clone https://github.com/Akash4317/QuickChat.git
    cd chat-application
 
    # Install backend dependencies
