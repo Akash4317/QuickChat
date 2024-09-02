@@ -1,3 +1,7 @@
+#Note:-
+This website is under construction however it is build enough one can check it out by running locally. the following thins are remainig is to make this code base using next.js and following tech stack which i have mentioned 
+
+
 # QuickChat
 This is a real-time chat application built using modern web technologies. It provides a seamless communication experience with features such as instant messaging, real-time updates, and a responsive user interface.
 
