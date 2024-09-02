@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        #rooms,
+        #chat {
+            background-color: #fff;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        input[type="text"],
+        button {
+            padding: 10px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        #messages {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Welcome to Chat App</h1>
+    <div id="rooms">
+        <input type="text" id="username" placeholder="Enter your username">
+        <input type="text" id="room" placeholder="Enter room name">
+        <button onclick="joinRoom()">Join Room</button>
+    </div>
+    <div id="chat" style="display: none;">
+        <div id="messages"></div>
+        <input type="text" id="messageInput" placeholder="Type your message">
+        <button onclick="sendMessage()">Send</button>
+        <button onclick="leaveRoom()">Leave Room</button>
+    </div>
+
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js" integrity="sha384-2huaZvOR9iDzHqslqwpR87isEmrfxqyWOF7hr7BY6KG0+hVKLoEXMPUJw3ynWuhO" crossorigin="anonymous"></script>
+    <script>
+        const socket = io("http://localhost:8080", {
+            transports: ["websocket"]
+        });
+
+        socket.on("connect", () => {
+            console.log("Connected to server");
+        });
+
+        socket.on("roomjoined", (room) => {
+            console.log("Joined room: " + room);
+            document.getElementById("rooms").style.display = "none";
+            document.getElementById("chat").style.display = "block";
+        });
+
+        socket.on("message", ({
+            username,
+            message
+        }) => {
+            const messagesDiv = document.getElementById("messages");
+            const messageDiv = document.createElement("div");
+            messageDiv.textContent = `${username}: ${message}`;
+            messagesDiv.appendChild(messageDiv);
+        });
+
+        socket.on("userjoined", (username) => {
+            const messagesDiv = document.getElementById("messages");
+            const messageDiv = document.createElement("div");
+            messageDiv.textContent = `${username} joined the room`;
+            messagesDiv.appendChild(messageDiv);
+        });
+
+        socket.on("userleft", (username) => {
+            const messagesDiv = document.getElementById("messages");
+            const messageDiv = document.createElement("div");
+            messageDiv.textContent = `${username} left the room`;
+            messagesDiv.appendChild(messageDiv);
+        });
+
+        function joinRoom() {
+            const username = document.getElementById("username").value;
+            const room = document.getElementById("room").value;
+            socket.emit("joinroom", username, room);
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById("messageInput");
+            const message = messageInput.value;
+            messageInput.value = "";
+            socket.emit("message", message);
+        }
+
+        function leaveRoom() {
+            const username = document.getElementById("username").value;
+            const room = document.getElementById("room").value;
+            socket.emit("leaveroom", username, room);
+            document.getElementById("rooms").style.display = "block";
+            document.getElementById("chat").style.display = "none";
+        }
+    </script>
+</body>
+
+</html>
